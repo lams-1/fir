@@ -1,67 +1,58 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
-import './App.css'
-import { createDetector, getAssetBase, loadConfig, type AppConfig, type ItemResult } from './core'
+import { AppShell, Burger, Group, NavLink, ScrollArea, Title } from '@mantine/core'
+import { useDisclosure, useDocumentTitle } from '@mantine/hooks'
+import { NavLink as RouterNavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import DashboardPage from './pages/DashboardPage'
+import StockpilePage from './pages/StockpilePage'
+
+const navItems = [
+  { label: 'Dashboard', to: '/dashboard' },
+  { label: 'Stockpile', to: '/stockpile' },
+]
 
 function App() {
-  const [config, setConfig] = useState<AppConfig | null>(null)
-  const [items, setItems] = useState<ItemResult[] | null>(null)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
-
-  useEffect(() => {
-    loadConfig()
-      .then(setConfig)
-      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
-  }, [])
-
-  const detector = useMemo(() => {
-    if (!config) return null
-    return createDetector({
-      version: config.version,
-      assetBase: getAssetBase(),
-    })
-  }, [config])
-
-  const onFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file || !detector) return
-
-    setError(null)
-    setMessage(null)
-    setItems(null)
-    setIsProcessing(true)
-
-    try {
-      const result = await detector.processFile(file)
-      setItems(result)
-      if (result.length === 0) {
-        setMessage('Aucun stockpile détecté dans cette image.')
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
-    } finally {
-      setIsProcessing(false)
-    }
+  const [opened, { toggle }] = useDisclosure()
+  const location = useLocation()
+  const titles: Record<string, string> = {
+    '/dashboard': 'Dashboard - 300 Tools',
+    '/stockpile': 'Stockpile - 300 Tools',
   }
+  useDocumentTitle(titles[location.pathname] ?? '300 Tools')
 
   return (
-    <div className="app">
-      <h1>Stockpile JSON (single image)</h1>
+    <AppShell
+      header={{ height: 60 }}
+      navbar={{ width: 260, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+      padding="md"
+    >
+      <AppShell.Header>
+        <Group h="100%" px="md">
+          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+          <Title order={4}>300</Title>
+        </Group>
+      </AppShell.Header>
 
-      <div className="controls">
-        <input type="file" accept="image/*" onChange={onFileChange} disabled={!config || isProcessing} />
-      </div>
+      <AppShell.Navbar p="md">
+        <AppShell.Section component={ScrollArea} grow>
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              label={item.label}
+              component={RouterNavLink}
+              to={item.to}
+              active={location.pathname === item.to}
+            />
+          ))}
+        </AppShell.Section>
+      </AppShell.Navbar>
 
-      {!config && !error && <p>Chargement de la configuration...</p>}
-      {isProcessing && <p>Traitement en cours...</p>}
-      {error && <p className="error">{error}</p>}
-      {message && !error && !isProcessing && <p>{message}</p>}
-
-      <pre className="output">
-        {items ? JSON.stringify(items, null, 2) : ''}
-      </pre>
-    </div>
+      <AppShell.Main>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/stockpile" element={<StockpilePage />} />
+        </Routes>
+      </AppShell.Main>
+    </AppShell>
   )
 }
 

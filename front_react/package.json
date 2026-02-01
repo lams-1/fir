@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run dev:root-assets",
+    "dev:app": "vite",
     "predev:root-assets": "npm run prepare:tesseract-assets",
     "dev:root-assets": "concurrently -n root,app \"python -m http.server 8000 --directory ..\" \"cross-env VITE_ASSET_PROXY=1 vite\"",
     "build": "tsc -b && vite build",
@@ -14,9 +15,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mantine/core": "^7.15.1",
+    "@mantine/hooks": "^7.15.1",
+    "@mantine/notifications": "^7.15.1",
     "@tensorflow/tfjs": "^4.22.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-router-dom": "^6.28.0",
     "tesseract.js": "^5.1.1",
     "tesseract.js-core": "^5.1.1"
   },

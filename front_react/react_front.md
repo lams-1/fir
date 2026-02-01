@@ -12,11 +12,15 @@ Ce fichier documente ce qui a été réalisé pendant la session, ainsi que le f
 - Mise en place d’un JSON brut en sortie (items + quantity + isCrated + DisplayName + CodeName).
 - Stabilisation du pipeline OCR (problèmes de chemins + signature createWorker v5).
 - Alignement du traitement screenshot sur la logique historique.
+- Ajout de Mantine v7 (AppShell + Notifications) et routing côté front.
+- Mise en place d’un AppShell et d’un layout multi-routes (Dashboard + Stockpile).
+- Dark mode activé par défaut via Mantine.
 
 ## Architecture du client React
 ### Dossiers clés
 - front_react/src
-  - App.tsx : UI minimale, upload d’image, affiche le JSON brut.
+  - App.tsx : AppShell + routing (Dashboard/Stockpile).
+  - pages/ : pages routées (Dashboard, Stockpile).
   - core/ : logique de traitement indépendante de l’UI.
 - front_react/public
   - config.json : version modèle.
@@ -36,9 +40,9 @@ Ce fichier documente ce qui a été réalisé pendant la session, ainsi que le f
 
 ## Fonctionnement du pipeline
 1) UI
-- App.tsx charge config.json.
+- StockpilePage charge config.json.
 - L’utilisateur upload une image.
-- App.tsx appelle createDetector().processFile(file).
+- StockpilePage appelle createDetector().processFile(file).
 
 2) Chargement des ressources
 - resources.ts construit les URLs selon VITE_ASSET_BASE ou le serveur Vite.
@@ -68,7 +72,9 @@ Ce fichier documente ce qui a été réalisé pendant la session, ainsi que le f
 ## Développement local
 Scripts utiles (front_react/package.json) :
 - npm run dev
-  - Vite standard.
+  - Lance Vite + serveur racine pour assets repo (par défaut).
+- npm run dev:app
+  - Vite standard (front uniquement).
 - npm run dev:root-assets
   - Lance Vite + serveur racine pour assets repo.
 
@@ -159,10 +165,24 @@ Le front est déployable en conteneur via un build multi‑stage (Node -> Nginx)
 - Nginx n’est pas obligatoire si Dokploy expose le conteneur via Traefik.
 - Vous pouvez garder Nginx (simple et léger) ou remplacer par un serveur statique Node.
 
+### Déploiement Dokploy (production)
+Déploiement actuel : https://300.lams-cloud1.work/
+
+Paramètres recommandés :
+- Build context : racine du dépôt (repo root)
+- Dockerfile : front_react/Dockerfile
+- Container port : 80
+- Domain path : /
+
+Notes TLS/DNS :
+- Cloudflare proxy désactivé pendant l’émission du certificat (DNS only).
+- HTTPS/TLS activé côté Dokploy (Traefik gère le certificat).
+
 ## Points de vigilance connus
 - Tesseract.js v5 requiert l’API createWorker('eng', ...).
 - Les chemins d’assets OCR doivent être servis par Vite (public/tesseract).
 - Le résultat dépend fortement de la qualité et du cadrage de la capture.
+- L’UI est désormais routée (AppShell), la page Stockpile est accessible via /stockpile.
 
 ## Fichiers importants à consulter
 - front_react/src/core/ocr.ts
@@ -170,6 +190,8 @@ Le front est déployable en conteneur via un build multi‑stage (Node -> Nginx)
 - front_react/src/core/detector.ts
 - front_react/src/core/resources.ts
 - front_react/src/App.tsx
+- front_react/src/pages/StockpilePage.tsx
+- front_react/src/pages/DashboardPage.tsx
 - front_react/vite.config.ts
 - front_react/scripts/prepare-tesseract-assets.mjs
 - front_react/scripts/build-bundle-assets.mjs
