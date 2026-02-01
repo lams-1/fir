@@ -19,7 +19,7 @@ import {
   loadConfig,
   type AppConfig,
   type ItemResult,
-} from '../core'
+} from '../stockpile'
 
 const ICON_SIZE = 48
 

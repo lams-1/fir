@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FileInput } from '@mantine/core'
 import '../App.css'
-import { createDetector, getAssetBase, loadConfig, type AppConfig, type ItemResult } from '../core'
+import { createDetector, getAssetBase, loadConfig, type AppConfig, type ItemResult } from '../stockpile'
 
 export default function StockpilePage() {
   const [config, setConfig] = useState<AppConfig | null>(null)

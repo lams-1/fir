@@ -5,7 +5,7 @@ Ce fichier documente ce qui a été réalisé pendant la session, ainsi que le f
 
 ## Résumé des actions de la session
 - Création d’un front React séparé dans le dossier front_react (Vite + TypeScript).
-- Séparation claire entre UI et logique de détection (dossier src/core).
+- Séparation claire entre UI et logique de détection (dossier src/stockpile).
 - Intégration TFJS pour la classification d’icônes et quantités.
 - Intégration Tesseract.js (OCR) avec assets locaux (worker/wasm/lang).
 - Ajout d’un pipeline d’assets pour le dev et le build (scripts Node).
@@ -22,13 +22,13 @@ Ce fichier documente ce qui a été réalisé pendant la session, ainsi que le f
 - front_react/src
   - App.tsx : AppShell + routing (Dashboard/Stockpile).
   - pages/ : pages routées (Dashboard, Stockpile).
-  - core/ : logique de traitement indépendante de l’UI.
+  - stockpile/ : logique de traitement indépendante de l’UI.
   - pages/StockpileIconsPage.tsx : grille d’icônes + quantités (masque les items à 0).
 - front_react/public
   - config.json : version modèle.
   - tesseract/ : assets OCR (worker, wasm, langues).
 
-### Modules principaux (src/core)
+### Modules principaux (src/stockpile)
 - config.ts
   - Charge public/config.json.
 - resources.ts
@@ -188,10 +188,10 @@ Notes TLS/DNS :
 - La page Stockpile icônes charge les images depuis /foxhole/<version>/icons/<CodeName>(-crated).png.
 
 ## Fichiers importants à consulter
-- front_react/src/core/ocr.ts
-- front_react/src/core/screenshot.ts
-- front_react/src/core/detector.ts
-- front_react/src/core/resources.ts
+- front_react/src/stockpile/ocr.ts
+- front_react/src/stockpile/screenshot.ts
+- front_react/src/stockpile/detector.ts
+- front_react/src/stockpile/resources.ts
 - front_react/src/App.tsx
 - front_react/src/pages/StockpilePage.tsx
 - front_react/src/pages/StockpileIconsPage.tsx
@@ -201,7 +201,7 @@ Notes TLS/DNS :
 - front_react/scripts/build-bundle-assets.mjs
 
 ## Notes pour évolutions futures (agents IA)
-- Préserver la séparation UI / core.
+- Préserver la séparation UI / stockpile.
 - Modifier la logique de détection dans screenshot.ts en priorité.
 - Adapter resources.ts pour supporter plusieurs versions en prod.
 - Ajouter un mode multi‑upload dans App.tsx.

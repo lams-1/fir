@@ -63,12 +63,12 @@ class OCR {
 
     for (let i = 0; i < this.#concurrency; ++i) {
       const worker = await createWorker('eng', undefined, {
-        logger: undefined,
+        logger: () => {},
         errorHandler: e => console.error('[Tesseract worker error]', e),
         langPath,
         workerPath,
         corePath,
-        cacheMethod: 'none',
+        cacheMethod: 'indexedDB',
         gzip: false,
         workerBlobURL: false,
       });
