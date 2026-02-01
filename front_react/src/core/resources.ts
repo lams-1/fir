@@ -1,6 +1,7 @@
 export type CatalogItem = {
   CodeName: string;
   DisplayName?: string;
+  Icon?: string;
   [key: string]: unknown;
 };
 
