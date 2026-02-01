@@ -1,0 +1,39 @@
+{
+  "name": "front_react",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "predev:root-assets": "npm run prepare:tesseract-assets",
+    "dev:root-assets": "concurrently -n root,app \"python -m http.server 8000 --directory ..\" \"cross-env VITE_ASSET_PROXY=1 vite\"",
+    "build": "tsc -b && vite build",
+    "prepare:tesseract-assets": "node scripts/prepare-tesseract-assets.mjs",
+    "build:bundle-assets": "node scripts/build-bundle-assets.mjs",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.22.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tesseract.js": "^5.1.1",
+    "tesseract.js-core": "^5.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^9.2.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vite": "^5.4.11"
+  }
+}
