@@ -2,15 +2,14 @@ import { AppShell, Burger, Group, NavLink, ScrollArea, Title } from '@mantine/co
 import { useDisclosure, useDocumentTitle } from '@mantine/hooks'
 import { NavLink as RouterNavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import DashboardPage from './pages/DashboardPage'
-import StockpilePage from './pages/StockpilePage'
 import StockpileIconsPage from './pages/StockpileIconsPage'
 
 const navItems = [
   { label: 'Dashboard', to: '/dashboard' },
   { label: 'Stockpile (icônes)', to: '/stockpile-icons' },
-  { label: 'Stockpile', to: '/stockpile' },
- 
 ]
+
+//  { label: 'Stockpile JSON', to: '/stockpile' },
 
 function App() {
   const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] = useDisclosure()
@@ -65,11 +64,14 @@ function App() {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/stockpile-icons" element={<StockpileIconsPage />} />
-          <Route path="/stockpile" element={<StockpilePage />} />
         </Routes>
       </AppShell.Main>
     </AppShell>
   )
 }
+
+          
+// <Route path="/stockpile" element={<Navigate to="/stockpile-icons" replace />} />
+
 
 export default App
