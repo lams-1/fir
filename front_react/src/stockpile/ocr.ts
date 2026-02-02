@@ -71,17 +71,20 @@ class OCR {
     const langPath = "https://files.kubuxu.com/foxhole/tesseract/";
 
     for (let i = 0; i < this.#concurrency; ++i) {
-      const worker = await createWorker("engJost-final3", undefined, {
-        logger: () => {},
-        errorHandler: (e) => console.error("[Tesseract worker error]", e),
-        langPath,
-        workerPath,
-        corePath,
-        cacheMethod: "indexedDB",
-        workerBlobURL: false,
-      });
-
-      workers.push(initWorker(this.#scheduler, worker));
+      workers.push(
+        (async () => {
+          const worker = await createWorker("engJost-final3", undefined, {
+            logger: () => {},
+            errorHandler: (e) => console.error("[Tesseract worker error]", e),
+            langPath,
+            workerPath,
+            corePath,
+            cacheMethod: "indexedDB",
+            workerBlobURL: false,
+          });
+          await initWorker(this.#scheduler, worker);
+        })(),
+      );
     }
 
     await (this.#starting = Promise.all(workers));
@@ -89,9 +92,17 @@ class OCR {
 
     async function initWorker(scheduler, worker) {
       try {
+        //await worker.loadLanguage('eng');
+        //await worker.initialize('eng');
         await worker.setParameters({
+          //tessedit_ocr_engine_mode: Tesseract.OEM.LSTM_ONLY,
           tessedit_char_whitelist: workerCharset,
           tessedit_pageseg_mode: 7, // Tesseract.PSM.SINGLE_LINE
+          //tessedit_pageseg_mode: 8, // Tesseract.PSM.SINGLE_WORD
+          //textord_disable_pitch_test: true,
+          //classify_enable_learning: 0,
+          //classify_enable_adaptive_matcher: 0,
+          //user_defined_dpi: 10,
           tessjs_create_hocr: 0,
           tessjs_create_tsv: 0,
         });

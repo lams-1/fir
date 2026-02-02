@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from "react";
 import {
   Alert,
+  Anchor,
   Badge,
   Button,
   Card,
@@ -13,17 +14,19 @@ import {
   Stack,
   Text,
   Title,
-} from '@mantine/core'
-import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
+} from "@mantine/core";
+
+import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
+
 import {
   createDetector,
   getAssetBase,
   loadConfig,
   type AppConfig,
   type ItemResult,
-} from '../stockpile'
+} from "../stockpile";
 
-const ICON_SIZE = 48
+const ICON_SIZE = 48;
 
 function buildVersionedIconUrl(
   codeName: string,
@@ -31,19 +34,19 @@ function buildVersionedIconUrl(
   version: string,
   assetBase: string,
 ) {
-  if (!codeName || !version) return null
-  const suffix = isCrated ? '-crated' : ''
-  const withSlash = `/foxhole/${version}/icons/${codeName}${suffix}.png`
-  return assetBase ? `${assetBase}${withSlash}` : withSlash
+  if (!codeName || !version) return null;
+  const suffix = isCrated ? "-crated" : "";
+  const withSlash = `/foxhole/${version}/icons/${codeName}${suffix}.png`;
+  return assetBase ? `${assetBase}${withSlash}` : withSlash;
 }
 
 type IconTileProps = {
-  item: ItemResult
-  iconUrl: string | null
-}
+  item: ItemResult;
+  iconUrl: string | null;
+};
 
 function IconTile({ item, iconUrl }: IconTileProps) {
-  const [broken, setBroken] = useState(false)
+  const [broken, setBroken] = useState(false);
 
   return (
     <Card withBorder padding="xs" radius="md">
@@ -69,19 +72,19 @@ function IconTile({ item, iconUrl }: IconTileProps) {
         </Badge>
       </Group>
     </Card>
-  )
+  );
 }
 
 function FilePreview({ file }: { file: File }) {
-  const [url, setUrl] = useState<string | null>(null)
+  const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const objectUrl = URL.createObjectURL(file)
-    setUrl(objectUrl)
-    return () => URL.revokeObjectURL(objectUrl)
-  }, [file])
+    const objectUrl = URL.createObjectURL(file);
+    setUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
 
-  if (!url) return null
+  if (!url) return null;
   return (
     <Stack gap={4} align="center" w={110}>
       <Image src={url} w={80} h={60} fit="cover" radius="sm" alt={file.name} />
@@ -89,112 +92,120 @@ function FilePreview({ file }: { file: File }) {
         {file.name}
       </Text>
     </Stack>
-  )
+  );
 }
 
 function aggregateItems(items: ItemResult[]) {
-  const map = new Map<string, ItemResult>()
+  const map = new Map<string, ItemResult>();
 
   for (const item of items) {
-    if (item.quantity <= 0) continue
-    const key = `${item.CodeName}-${item.isCrated}`
-    const existing = map.get(key)
+    if (item.quantity <= 0) continue;
+    const key = `${item.CodeName}-${item.isCrated}`;
+    const existing = map.get(key);
     if (existing) {
-      existing.quantity += item.quantity
-      continue
+      existing.quantity += item.quantity;
+      continue;
     }
-    map.set(key, { ...item })
+    map.set(key, { ...item });
   }
 
-  return Array.from(map.values()).sort((a, b) => b.quantity - a.quantity)
+  return Array.from(map.values()).sort((a, b) => b.quantity - a.quantity);
 }
 
 export default function StockpileMultiScreenPage() {
-  const [config, setConfig] = useState<AppConfig | null>(null)
-  const [items, setItems] = useState<ItemResult[] | null>(null)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
-  const [processedCount, setProcessedCount] = useState(0)
+  const [config, setConfig] = useState<AppConfig | null>(null);
+  const [items, setItems] = useState<ItemResult[] | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [processedCount, setProcessedCount] = useState(0);
 
   const resetAll = () => {
-    setSelectedFiles([])
-    setItems(null)
-    setMessage(null)
-    setError(null)
-    setProcessedCount(0)
-  }
+    setSelectedFiles([]);
+    setItems(null);
+    setMessage(null);
+    setError(null);
+    setProcessedCount(0);
+  };
 
   useEffect(() => {
     loadConfig()
       .then(setConfig)
-      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
-  }, [])
+      .catch((err) =>
+        setError(err instanceof Error ? err.message : String(err)),
+      );
+  }, []);
 
   const detector = useMemo(() => {
-    if (!config) return null
+    if (!config) return null;
     return createDetector({
       version: config.version,
       assetBase: getAssetBase(),
-    })
-  }, [config])
+    });
+  }, [config]);
 
   const onFilesChange = (files: File[]) => {
-    setSelectedFiles((prev) => [...prev, ...files])
-    setError(null)
-    setMessage(null)
-  }
+    setSelectedFiles((prev) => [...prev, ...files]);
+    setError(null);
+    setMessage(null);
+  };
 
   const onAnalyze = async () => {
-    if (!selectedFiles.length || !detector) return
+    if (!selectedFiles.length || !detector) return;
 
-    setError(null)
-    setMessage(null)
-    setItems(null)
-    setIsProcessing(true)
-    setProcessedCount(0)
+    setError(null);
+    setMessage(null);
+    setItems(null);
+    setIsProcessing(true);
+    setProcessedCount(0);
 
     try {
-      const results: ItemResult[] = []
+      const results: ItemResult[] = [];
       for (let i = 0; i < selectedFiles.length; i++) {
-        setProcessedCount(i + 1)
-        const itemsForFile = await detector.processFile(selectedFiles[i])
-        results.push(...itemsForFile)
+        setProcessedCount(i + 1);
+        const itemsForFile = await detector.processFile(selectedFiles[i]);
+        results.push(...itemsForFile);
       }
-      const aggregated = aggregateItems(results)
-      setItems(aggregated)
+      const aggregated = aggregateItems(results);
+      setItems(aggregated);
       if (aggregated.length === 0) {
-        setMessage('Aucun stockpile détecté dans ces images.')
+        setMessage("Aucun stockpile détecté dans ces images.");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
-  const assetBase = getAssetBase()
-  const version = config?.version ?? ''
+  const assetBase = getAssetBase();
+  const version = config?.version ?? "";
 
   return (
     <Stack gap="md" p="md">
       <Title order={2}>Stockpile (multi screen)</Title>
 
       <Alert variant="light" color="blue" title="Upload multiple">
-        Vous pouvez déposer plusieurs images (glisser-déposer). Les quantités seront cumulées.
+        Vous pouvez déposer plusieurs images (glisser-déposer). Les quantités
+        seront cumulées.
       </Alert>
 
       <Stack gap="xs">
         <Text size="sm" c="dimmed">
           Charger des images de stockpile (captures entières depuis la map)
         </Text>
+        <Anchor href="/ui-assets/images/stock_exemple.jpg" download size="sm">
+          Télécharger une image d'exemple
+        </Anchor>
         <Dropzone
           accept={IMAGE_MIME_TYPE}
           multiple
           onDrop={onFilesChange}
           onReject={() => {
-            setError('Certains fichiers ont été rejetés. Formats acceptés : images.')
+            setError(
+              "Certains fichiers ont été rejetés. Formats acceptés : images.",
+            );
           }}
           disabled={!config || isProcessing}
         >
@@ -208,7 +219,9 @@ export default function StockpileMultiScreenPage() {
               </Text>
             </Dropzone.Reject>
             <Dropzone.Idle>
-              <Text fw={500}>Glissez-déposez vos images ou cliquez pour sélectionner</Text>
+              <Text fw={500}>
+                Glissez-déposez vos images ou cliquez pour sélectionner
+              </Text>
             </Dropzone.Idle>
             <Text size="sm" c="dimmed">
               Images uniquement (PNG, JPG, etc.)
@@ -230,7 +243,12 @@ export default function StockpileMultiScreenPage() {
                 {selectedFiles.length} image(s) sélectionnée(s)
               </Text>
             </Group>
-            <Button variant="light" size="xs" onClick={resetAll} disabled={isProcessing}>
+            <Button
+              variant="light"
+              size="xs"
+              onClick={resetAll}
+              disabled={isProcessing}
+            >
               Réinitialiser
             </Button>
           </Group>
@@ -266,13 +284,18 @@ export default function StockpileMultiScreenPage() {
       {items && items.length > 0 && (
         <SimpleGrid
           cols={{ base: 2, sm: 3, md: 4, lg: 6, xl: 8 }}
-          spacing={{ base: 'sm', sm: 'md' }}
+          spacing={{ base: "sm", sm: "md" }}
         >
           {items.map((item) => (
             <IconTile
               key={`${item.CodeName}-${item.quantity}-${item.isCrated}`}
               item={item}
-              iconUrl={buildVersionedIconUrl(item.CodeName, item.isCrated, version, assetBase)}
+              iconUrl={buildVersionedIconUrl(
+                item.CodeName,
+                item.isCrated,
+                version,
+                assetBase,
+              )}
             />
           ))}
         </SimpleGrid>
@@ -284,5 +307,5 @@ export default function StockpileMultiScreenPage() {
         </Center>
       )}
     </Stack>
-  )
+  );
 }
