@@ -29,15 +29,15 @@ Ce fichier documente ce qui a été réalisé pendant la session, ainsi que le f
   - App.tsx : AppShell + routing (Dashboard/Stockpile).
   - pages/ : pages routées (Dashboard, Stockpile).
   - stockpile/ : logique de traitement indépendante de l’UI.
+    - config.ts : Définition de la version du jeu (par défaut `airborne-63`).
   - pages/StockpileIconsPage.tsx : grille d’icônes + quantités (masque les items à 0).
   - pages/StockpileMultiScreenPage.tsx : version multi-images avec cumul automatique des quantités via Dropzone.
 - front_react/public
-  - config.json : version modèle.
   - tesseract/ : assets OCR (worker, wasm, langues).
 
 ### Modules principaux (src/stockpile)
 - config.ts
-  - Charge public/config.json.
+  - Gère la version via une constante ou `VITE_APP_FOXHOLE_VERSION`.
 - resources.ts
   - Construit les URLs d’assets (catalogue, class_names, modèles).
 - detector.ts
@@ -49,7 +49,7 @@ Ce fichier documente ce qui a été réalisé pendant la session, ainsi que le f
 
 ## Fonctionnement du pipeline
 1) UI
-- StockpilePage charge config.json.
+- StockpilePage récupère la version via `loadConfig()` (donnée locale/env).
 - L’utilisateur upload une image.
 - StockpilePage appelle createDetector().processFile(file).
 

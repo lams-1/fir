@@ -1,12 +1,12 @@
-import { Box, Center, Image, Text, Title } from '@mantine/core'
+import { Text, Title } from "@mantine/core";
 
 export default function DashboardPage() {
   return (
-    <div style={{ padding: '1rem' }}>
+    <div style={{ padding: "1rem" }}>
       <Title order={2}>Dashboard</Title>
       <Text c="dimmed">Placeholder pour un futur écran.</Text>
 
-      <Center mt="md">
+      {/* <Center mt="md">
         <Box style={{ width: '100%', maxWidth: 900 }}>
           <Image
             src="/ui-assets/images/Zonure.jpg"
@@ -18,7 +18,7 @@ export default function DashboardPage() {
             decoding="async"
           />
         </Box>
-      </Center>
+      </Center> */}
     </div>
-  )
+  );
 }
