@@ -16,6 +16,12 @@ Ce fichier documente ce qui a été réalisé pendant la session, ainsi que le f
 - Mise en place d’un AppShell et d’un layout multi-routes (Dashboard + Stockpile).
 - Dark mode activé par défaut via Mantine.
 - Ajout d’une page Stockpile en grille d’icônes (responsive), avec quantités en badge.
+- Ajout d’une page Stockpile (multi screen) permettant l’import de plusieurs images via un Dropzone.
+- Mise en place de l’agrégation des quantités par item (CodeName + isCrated) pour le multi-upload.
+- Intégration de @mantine/dropzone pour une meilleure expérience d’upload (drag-and-drop).
+- Optimisation du traitement multi-fichiers en séquentiel pour garantir la stabilité de l’OCR.
+- Mise en place d’une file d’attente manuelle pour le multi-upload : les images s’accumulent et l’analyse est déclenchée par un bouton dédié.
+- Ajout d’une galerie de prévisualisation des fichiers sélectionnés avec affichage des noms de fichiers.
 
 ## Architecture du client React
 ### Dossiers clés
@@ -24,6 +30,7 @@ Ce fichier documente ce qui a été réalisé pendant la session, ainsi que le f
   - pages/ : pages routées (Dashboard, Stockpile).
   - stockpile/ : logique de traitement indépendante de l’UI.
   - pages/StockpileIconsPage.tsx : grille d’icônes + quantités (masque les items à 0).
+  - pages/StockpileMultiScreenPage.tsx : version multi-images avec cumul automatique des quantités via Dropzone.
 - front_react/public
   - config.json : version modèle.
   - tesseract/ : assets OCR (worker, wasm, langues).
@@ -185,6 +192,7 @@ Notes TLS/DNS :
 - Les chemins d’assets OCR doivent être servis par Vite (public/tesseract).
 - Le résultat dépend fortement de la qualité et du cadrage de la capture.
 - L’UI est désormais routée (AppShell), la page Stockpile est accessible via /stockpile.
+- La page Stockpile multi-screen (/stockpile-multi) utilise un Dropzone pour accumuler les fichiers, puis traite la file séquentiellement après déclenchement manuel.
 - La page Stockpile icônes charge les images depuis /foxhole/<version>/icons/<CodeName>(-crated).png.
 
 ## Fichiers importants à consulter
@@ -195,6 +203,7 @@ Notes TLS/DNS :
 - front_react/src/App.tsx
 - front_react/src/pages/StockpilePage.tsx
 - front_react/src/pages/StockpileIconsPage.tsx
+- front_react/src/pages/StockpileMultiScreenPage.tsx
 - front_react/src/pages/DashboardPage.tsx
 - front_react/vite.config.ts
 - front_react/scripts/prepare-tesseract-assets.mjs

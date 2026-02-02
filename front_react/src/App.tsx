@@ -3,10 +3,12 @@ import { useDisclosure, useDocumentTitle } from '@mantine/hooks'
 import { NavLink as RouterNavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import DashboardPage from './pages/DashboardPage'
 import StockpileIconsPage from './pages/StockpileIconsPage'
+import StockpileMultiScreenPage from './pages/StockpileMultiScreenPage'
 
 const navItems = [
   { label: 'Dashboard', to: '/dashboard' },
   { label: 'Stockpile (icônes)', to: '/stockpile-icons' },
+  { label: 'Stockpile (multi screen)', to: '/stockpile-multi' },
 ]
 
 //  { label: 'Stockpile JSON', to: '/stockpile' },
@@ -19,6 +21,7 @@ function App() {
     '/dashboard': 'Dashboard - 300 Tools',
     '/stockpile': 'Stockpile - 300 Tools',
     '/stockpile-icons': 'Stockpile (icônes) - 300 Tools',
+    '/stockpile-multi': 'Stockpile (multi screen) - 300 Tools',
   }
   useDocumentTitle(titles[location.pathname] ?? '300 Tools')
 
@@ -64,6 +67,7 @@ function App() {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/stockpile-icons" element={<StockpileIconsPage />} />
+          <Route path="/stockpile-multi" element={<StockpileMultiScreenPage />} />
         </Routes>
       </AppShell.Main>
     </AppShell>
