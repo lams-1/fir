@@ -113,10 +113,10 @@ Objectif : servir un site statique (dist-bundle) via un serveur web (ex: Nginx).
 - Le dossier prêt à servir est front_react/dist-bundle
 
 4) Déploiement des fichiers
-- Copier front_react/dist-bundle vers un répertoire public (ex: /var/www/react_front).
+- Copier front_react/dist-bundle vers un répertoire public (ex: /var/www/front_react).
 
 5) Nginx (exemple minimal)
-- Racine : /var/www/react_front
+- Racine : /var/www/front_react
 - Index : index.html
 - Assurer le fallback SPA vers index.html
 
@@ -126,7 +126,7 @@ server {
   listen 80;
   server_name <votre_domaine>;
 
-  root /var/www/react_front;
+  root /var/www/front_react;
   index index.html;
 
   location / {
@@ -141,11 +141,11 @@ server {
   - /tesseract/tesseract-core-simd.wasm.js
   - /tesseract/lang/eng.traineddata
 
-### Déploiement derrière un sous-chemin (ex: /react/)
+### Déploiement derrière un sous-chemin (ex: /front_react/)
 Si le front est servi sous un sous-chemin, il faut configurer la base Vite :
-- Mettre base: '/react/' dans front_react/vite.config.ts
+- Mettre base: '/front_react/' dans front_react/vite.config.ts
 - Rebuild (npm run build:bundle-assets)
-- Nginx doit servir dist-bundle sous /react/
+- Nginx doit servir dist-bundle sous /front_react/
 
 ### Remarques
 - Le build produit tous les assets nécessaires (TFJS + Tesseract + modèles).
