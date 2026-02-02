@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { createScheduler, createWorker } from 'tesseract.js';
+import { createScheduler, createWorker } from "tesseract.js";
 
 class OCR {
   static CPU_COUNT = navigator.hardwareConcurrency || 1;
@@ -7,10 +7,10 @@ class OCR {
   static DEFAULT_STOP_DELAY = 2500;
 
   static CHARSETS = {
-    any: '',
-    quantity: '0123456789k+',
+    any: "",
+    quantity: "0123456789k+",
   };
-  static DEFAULT_CHARSET = OCR.CHARSETS['quantity'];
+  static DEFAULT_CHARSET = OCR.CHARSETS["quantity"];
 
   #concurrency;
   #stop_delay;
@@ -20,11 +20,14 @@ class OCR {
     options ||= {};
     this.#concurrency = options.concurrency || OCR.DEFAULT_CONCURRENCY;
     this.#stop_delay = options.stop_delay || OCR.DEFAULT_STOP_DELAY;
-    this.#charset = options.charset !== undefined ? options.charset : OCR.DEFAULT_CHARSET;
+    this.#charset =
+      options.charset !== undefined ? options.charset : OCR.DEFAULT_CHARSET;
   }
 
   async recognize(canvas) {
-    const result = await (await this.#getScheduler()).addJob('recognize', canvas);
+    const result = await (
+      await this.#getScheduler()
+    ).addJob("recognize", canvas);
 
     if (this.#scheduler.getQueueLen() == 0) {
       this.#scheduleStop();
@@ -33,15 +36,15 @@ class OCR {
     return result;
   }
 
-  #state = 'stopped'; // 'starting', 'started', 'stopping'
+  #state = "stopped"; // 'starting', 'started', 'stopping'
   #scheduler = undefined;
   #starting = undefined;
   async #getScheduler() {
-    if (this.#state == 'stopping') {
+    if (this.#state == "stopping") {
       this.#cancelStop();
-    } else if (this.#state == 'stopped') {
+    } else if (this.#state == "stopped") {
       await this.#start();
-    } else if (this.#state == 'starting') {
+    } else if (this.#state == "starting") {
       await this.#starting;
     }
 
@@ -49,27 +52,32 @@ class OCR {
   }
 
   async #start() {
-    this.#state = 'starting';
-    console.log('Launching ' + this.#concurrency + ' Tesseract OCR workers.');
+    this.#state = "starting";
+    console.log("Launching " + this.#concurrency + " Tesseract OCR workers.");
 
     this.#scheduler = createScheduler();
 
     const workers = [];
     const workerCharset = this.#charset;
-    const baseUrl = new URL(import.meta?.env?.BASE_URL || '/', window.location.href);
-    const workerPath = new URL('tesseract/worker.min.js', baseUrl).toString();
-    const corePath = new URL('tesseract/tesseract-core-simd.wasm.js', baseUrl).toString();
-    const langPath = new URL('tesseract/lang/', baseUrl).toString();
+    const baseUrl = new URL(
+      import.meta?.env?.BASE_URL || "/",
+      window.location.href,
+    );
+    const workerPath = new URL("tesseract/worker.min.js", baseUrl).toString();
+    const corePath = new URL(
+      "tesseract/tesseract-core-simd.wasm.js",
+      baseUrl,
+    ).toString();
+    const langPath = "https://files.kubuxu.com/foxhole/tesseract/";
 
     for (let i = 0; i < this.#concurrency; ++i) {
-      const worker = await createWorker('eng', undefined, {
+      const worker = await createWorker("engJost-final3", undefined, {
         logger: () => {},
-        errorHandler: e => console.error('[Tesseract worker error]', e),
+        errorHandler: (e) => console.error("[Tesseract worker error]", e),
         langPath,
         workerPath,
         corePath,
-        cacheMethod: 'indexedDB',
-        gzip: false,
+        cacheMethod: "indexedDB",
         workerBlobURL: false,
       });
 
@@ -77,7 +85,7 @@ class OCR {
     }
 
     await (this.#starting = Promise.all(workers));
-    this.#state = 'started';
+    this.#state = "started";
 
     async function initWorker(scheduler, worker) {
       try {
@@ -90,7 +98,7 @@ class OCR {
 
         scheduler.addWorker(worker);
       } catch (err) {
-        console.error('[Tesseract] worker init failed', err);
+        console.error("[Tesseract] worker init failed", err);
         throw err;
       }
     }
@@ -98,7 +106,7 @@ class OCR {
 
   #stopTimeout = undefined;
   #scheduleStop() {
-    if (!((this.#state == 'started') || (this.#state == 'stopping'))) {
+    if (!(this.#state == "started" || this.#state == "stopping")) {
       console.error(`scheduleStop(): invalid state=${this.#state}`);
       return;
     }
@@ -106,25 +114,25 @@ class OCR {
     if (this.#stopTimeout) {
       this.#cancelStop();
     }
-    this.#state = 'stopping';
+    this.#state = "stopping";
     this.#stopTimeout = setTimeout(this.#stop.bind(this), this.#stop_delay);
   }
 
   #cancelStop() {
-    if (this.#state != 'stopping') {
+    if (this.#state != "stopping") {
       console.error(`cancelStop(): invalid state=${this.#state}`);
       return;
     }
 
     clearTimeout(this.#stopTimeout);
     this.#stopTimeout = undefined;
-    this.#state = 'started';
+    this.#state = "started";
   }
 
   async #stop() {
     this.#stopTimeout = undefined;
-    this.#state = 'stopped';
-    console.log('Terminating Tesseract OCR workers.');
+    this.#state = "stopped";
+    console.log("Terminating Tesseract OCR workers.");
     await this.#scheduler.terminate();
   }
 }
